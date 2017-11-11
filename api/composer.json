@@ -1,0 +1,16 @@
+{
+  "name": "gravity/hospital_app",
+  "description": "Entry challenge app for CareHack",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "team gravity",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "catfan/medoo": "v1.4.5",
+    "firebase/php-jwt": "^5.0"
+  }
+}
