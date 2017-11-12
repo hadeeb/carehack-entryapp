@@ -5,7 +5,7 @@
  * Date: 11/11/17
  * Time: 10:28 PM
  */
-require "Medoo.php";
+require_once "../vendor/autoload.php";
 
 use Medoo\Medoo;
 
@@ -15,15 +15,14 @@ class Connection
      *  Connection variables
      */
     private $dbName = "hospital";
-    public $tbAppHistory = "apphistory";
-    public $tbAppPending = "apppending";
-    public $tbDept = "dept";
-    public $tbDoctor = "doctor";
-    public $tbPatient = "patient";
-    public $tbUser = "user";
-    public $tbDoctorAvail = "doctoravail";
 
-    public $db;
+    /*
+     * TODO
+     * Relocate key to somewhere else and generate dynamically
+     */
+    static $key = "secret_key";
+
+    private $db = null;
 
     /**
      * Connection constructor.
@@ -40,6 +39,16 @@ class Connection
             ]
         );
     }
+
+    /**
+     * @return Medoo|null
+     */
+    public function getDb()
+    {
+        return $this->db;
+    }
+
+
 
 
 }

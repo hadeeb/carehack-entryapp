@@ -8,7 +8,17 @@
  * @param string $token
  * @return bool
  */
-function verify(string $token)
+
+require_once "../vendor/autoload.php";
+require_once "../config/Connection.php";
+use Firebase\JWT\JWT;
+
+function verify(string $token,int $user)
 {
-    return true;
+    try{
+        $key = (array)JWT::decode($token,Connection::$key, array('HS256'));
+        if($key["id"]==$user)
+            return true;
+    }catch (Exception $e){return false;};
+    return false;
 }
