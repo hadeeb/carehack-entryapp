@@ -11,7 +11,7 @@ class Patient
 {
     private $db;
     private $id;
-    private $loginid;
+    private $status;
     private $fname;
     private $lname;
     private $age;
@@ -21,19 +21,20 @@ class Patient
 
     /**
      * Patient constructor.
-     * @param $db
-     * @param $loginid
+     * @param \Medoo\Medoo $db
+     * @param int $id
+     * @internal param $loginid
      */
-    public function __construct(\Medoo\Medoo $db,int $loginid)
-    {
-        $this->id = 0;
-        $this->db = $db;
-        $this->loginid = $loginid;
-    }
-
-    private function init(int $id)
+    public function __construct(\Medoo\Medoo $db,int $id)
     {
         $this->id = $id;
+        $this->db = $db;
+        $this->status = false;
+        $this->init();
+    }
+
+    private function init()
+    {
         $res = $this->db->get(
             TABLES::$patient,
             ["fname","lname","age","gender","phone","address"],
@@ -47,29 +48,10 @@ class Patient
             $this->gender = $res["gender"];
             $this->phone = $res["phone"];
             $this->address = $res["address"];
+            $this->status = true;
         }
     }
-
-    public function newUser()
-    {
-        $this->db->insert(
-            TABLES::$patient,
-            [
-                "loginid"=>$this->loginid,
-                "fname"=>$this->fname,
-                "lname"=>$this->lname,
-                "age"=>$this->age,
-                "gender"=>$this->gender,
-                "phone"=>$this->phone,
-                "address"=>$this->address
-            ]
-        );
-        $this->id = $this->db->id();
-        if($this->id>0)
-            return true;
-        return false;
-    }
-
+/*
     public function update()
     {
         $res = $this->db->update(
@@ -88,14 +70,12 @@ class Patient
             return true;
         return false;
     }
-
-    public function getAll(int $id)
+*/
+    public function getAll()
     {
-        $this->init($id);
-        if($this->id>0)
+        if($this->status)
             return array(
                 $this->id,
-                $this->loginid,
                 $this->fname,
                 $this->lname,
                 $this->age,
@@ -107,13 +87,4 @@ class Patient
             return array(0);
     }
 
-    public function setAll(array $details)
-    {
-        $this->fname = $details[0];
-        $this->lname = $details[1];
-        $this->age = $details[2];
-        $this->gender = $details[3];
-        $this->phone = $details[4];
-        $this->address = $details[5];
-    }
 }

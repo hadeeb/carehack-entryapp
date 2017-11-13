@@ -5,9 +5,20 @@
  * Date: 11/11/17
  * Time: 10:10 PM
  */
+/*
+ * Testing
+ * Migrate login and register to fb and google
+ */
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
 include_once "../vendor/autoload.php";
 include_once "../misc/error.php";
 include_once "../config/Connection.php";
+include_once "../config/TABLES.php";
 
 use Firebase\JWT\JWT;
 
@@ -48,11 +59,11 @@ function generateToken($type,$login,$password)
         [$col=>$login]
     );
 
-    $key["id"] = $id;
+    $key["id"] = (int)$id["id"];
 
     $token = JWT::encode($key,Connection::$key);
 
     print_r(json_encode(
-        array("status"=>1,"token"=>$token)
+        array("status"=>1,"token"=>$token,"userid"=>$id["id"])
     ));
 }

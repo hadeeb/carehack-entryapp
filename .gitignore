@@ -1,1 +1,5 @@
 .idea
+/testsite/
+/api/vendor/
+/api/test.php
+/admin/

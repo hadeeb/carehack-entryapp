@@ -12,44 +12,101 @@ use Medoo\Medoo;
 class Appointment
 {
     private $db;
+    private $id;
     private $patient;
+    private $doctor;
+    private $date;
+    private $status;
 
     /**
      * Appointment constructor.
-     * @param $db
-     * @param $patient
+     * @param Medoo $db
+     * @param int $id
+     * @internal param $patient
      */
-    public function __construct(Medoo $db,int $patient)
+    public function __construct(Medoo $db,int $id)
     {
         $this->db = $db;
-        $this->patient = $patient;
+        $this->id = $id;
         $this->init();
     }
 
     private function init()
     {
-
-    }
-
-    public function getPending()
-    {
-        $res = $this->db->select(
-            TABLES::$pending,
-            ["id","pid","did","date"],
-            ["pid"=>$this->patient]
+        $res = $this->db->get(
+            TABLES::$appointments,
+            ["pid","did","date","status"],
+            ["id"=>$this->id]
         );
-        return array_values($res);
+        if($res)
+        {
+            $this->patient = $res["pid"];
+            $this->doctor = $res["did"];
+            $this->date = $res["date"];
+            $this->status = $res["status"];
+        }
     }
 
-    public function getHistory()
+    public function getAll()
     {
-        $res = $this->db->select(
-            TABLES::$history,
-            ["id","pid","did","date"],
-            ["pid"=>$this->patient]
+        return array(
+            $this->patient,
+            $this->doctor,
+            $this->date,
+            $this->status
         );
-        return array_values($res);
     }
 
+    public function cancel()
+    {
+        if($this->status<1)
+        {
+            $res = $this->db->delete(
+                TABLES::$appointments,
+                ["id"=>$this->id]
+            );
+            if($res)
+                return 1;
+        }
+
+        return 0;
+    }
+
+    static function available(Medoo $db,$did,$date)
+    {
+        $time = strtotime($date);
+        $day = $date('D',$time);
+
+        $num = self::dayToNum($day);
+
+        $res = $db->select(
+            TABLES::$avail,
+            ["day"],
+            ["did"=>$did]
+        );
+        if($res)
+        {
+            foreach ($res as $row)
+                if($row["day"]==$num)
+                    return true;
+        }
+        return false;
+    }
+
+    static function dayToNum($day)
+    {
+        $num = 0;
+        switch ($day)
+        {
+            case "Sun":$num = 1;break;
+            case "Mon":$num = 2;break;
+            case "Tue":$num = 3;break;
+            case "Wed":$num = 4;break;
+            case "Thu":$num = 5;break;
+            case "Fri":$num = 6;break;
+            case "Sat":$num = 7;break;
+        }
+        return $num;
+    }
 
 }

@@ -7,6 +7,7 @@
  * Time: 12:35 AM
  */
 require_once "../config/TABLES.php";
+require_once "../vendor/autoload.php";
 class User
 {
     private $id;
@@ -22,12 +23,14 @@ class User
     /**
      * User constructor.
      * @param \Medoo\Medoo $db
+     * @param int $id
      */
-    public function __construct(\Medoo\Medoo $db)
+    public function __construct(\Medoo\Medoo $db,int $id)
     {
         $this->db = $db;
-        $this->id = 0;
+        $this->id = $id;
         $this->patients = array();
+        $this->init();
     }
 
     private function init()
@@ -66,31 +69,56 @@ class User
         return $this->patients;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId(int $id)
+    public function newPatient(array $details)
     {
-        $this->id = $id;
-        $this->init();
+        $fname = $details[0];
+        $lname = $details[1];
+        $age = $details[2];
+        $gender = $details[3];
+        $phone = $details[4];
+        $address = $details[5];
+        $this->db->insert(
+            TABLES::$patient,
+            [
+                "loginid"=>$this->id,
+                "fname"=>$fname,
+                "lname"=>$lname,
+                "age"=>$age,
+                "gender"=>$gender,
+                "phone"=>$phone,
+                "address"=>$address
+            ]
+        );
+        return $this->db->id();
     }
 
     public function getAppointments()
     {
-        $pending = $this->db->select(
-            TABLES::$pending,
-            ["id","pid","did","date"],
+        $appointments = $this->db->select(
+            TABLES::$appointments,
+            ["id","pid","did","date","status"],
             ["pid"=>$this->patients]
         );
-        $pending = array_values($pending);
+        return array_values($appointments);
+    }
 
-        $history = $this->db->select(
-            TABLES::$history,
-            ["id","pid","did","date"],
-            ["pid"=>$this->patients]
+    public function addAppointment(array $details)
+    {
+        $pid = $details[0];
+        $did = $details[1];
+        $date = $details[2];
+
+        $this->db->insert(
+            TABLES::$appointments,
+            [
+                "pid"=>$pid,
+                "did"=>$did,
+                "date"=>$date,
+                "status"=>0
+            ]
         );
-        $history = array_values($history);
-        return array("pending"=>$pending,"history"=>$history);
+
+        return $this->db->id();
     }
 
 }

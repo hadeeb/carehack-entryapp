@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: farhan
- * Date: 11/11/17
- * Time: 10:47 PM
+ * Date: 13/11/17
+ * Time: 8:53 AM
  */
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: access");
@@ -15,6 +15,7 @@ include_once "../config/Connection.php";
 include_once "../objects/User.php";
 include_once "../auth/verify.php";
 include_once "../misc/error.php";
+include_once "../config/TABLES.php";
 
 $token = isset($_GET['token'])?$_GET['token']:error(2);
 $user = isset($_GET['id']) ? $_GET['id'] : error(2);
@@ -22,8 +23,18 @@ if(!verify($token,$user))
     error(1);
 $database = new Connection();
 $db = $database->getDb();
-$user = (int)$user;
-$app = new User($db,$user);
-$array = $app->getAppointments();
-$array["status"] = 1;
-print_r(json_encode($array));
+
+$depts = $db->select(
+    TABLES::$dept,
+    ["id","name","phone"]
+);
+$doctors = $db->select(
+    TABLES::$doctor,
+    ["id","name","dept","qual","phone"]
+);
+$avail = $db->select(
+    TABLES::$avail,
+    ["did","day"]
+);
+
+print_r(json_encode(array("status"=>1,"depts"=>$depts,"doctors"=>$doctors,"availability"=>$avail)));

@@ -23,6 +23,9 @@ function error(int $id)
             //Login fail
             print_r(json_encode(array("status"=>0,"message"=>"Login failed")));
             break;
+        case 4:
+            print_r(json_encode(array("status"=>0,"message"=>"Invalid parameters")));
+            break;
     }
     die();
 }

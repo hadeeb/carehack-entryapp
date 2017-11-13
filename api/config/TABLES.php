@@ -8,8 +8,7 @@
  */
 class TABLES
 {
-    static $history = "apphistory";
-    static $pending = "apppending";
+    static $appointments = "appointments";
     static $dept    = "dept";
     static $doctor  = "doctor";
     static $avail   = "doctoravail";
