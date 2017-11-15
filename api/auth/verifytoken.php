@@ -17,7 +17,18 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 $id = isset($_POST['id'])?$_POST['id']:0;
 $token = isset($_POST["token"])?$_POST["token"]:"0";
 
+file_put_contents("log.txt",$id.PHP_EOL,FILE_APPEND|LOCK_EX);
+
+
 if(verify($token,$id))
-    print_r(json_encode(array("status"=>1)));
+{
+    $new = false;
+    if(isNewUser($id))
+    {
+        $new = true;
+    }
+
+    print_r(json_encode(array("status"=>1,"new"=>$new)));
+}
 else
     print_r(json_encode(array("status"=>0)));

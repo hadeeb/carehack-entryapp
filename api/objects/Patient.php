@@ -12,12 +12,9 @@ class Patient
     private $db;
     private $id;
     private $status;
-    private $fname;
-    private $lname;
+    private $name;
     private $age;
     private $gender;
-    private $phone;
-    private $address;
 
     /**
      * Patient constructor.
@@ -37,51 +34,26 @@ class Patient
     {
         $res = $this->db->get(
             TABLES::$patient,
-            ["fname","lname","age","gender","phone","address"],
+            ["name","age","gender"],
             ["id"=>$this->id]
         );
         if($res)
         {
-            $this->fname = $res["fname"];
-            $this->lname = $res["lname"];
+            $this->name = $res["name"];
             $this->age = $res["age"];
             $this->gender = $res["gender"];
-            $this->phone = $res["phone"];
-            $this->address = $res["address"];
             $this->status = true;
         }
     }
-/*
-    public function update()
-    {
-        $res = $this->db->update(
-          TABLES::$patient,
-          [
-              "fname"=>$this->fname,
-              "lname"=>$this->lname,
-              "age"=>$this->age,
-              "gender"=>$this->gender,
-              "phone"=>$this->phone,
-              "address"=>$this->address
-              ],
-          ["id"=>$this->id]
-        );
-        if($res)
-            return true;
-        return false;
-    }
-*/
+
     public function getAll()
     {
         if($this->status)
             return array(
                 $this->id,
-                $this->fname,
-                $this->lname,
-                $this->age,
-                $this->gender,
-                $this->phone,
-                $this->address
+                $this->name,
+                (int)$this->age,
+                (int)$this->gender,
             );
         else
             return array(0);

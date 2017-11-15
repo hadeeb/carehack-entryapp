@@ -7,7 +7,7 @@
  */
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: access");
-header("Access-Control-Allow-Methods: GET");
+header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 
@@ -16,14 +16,13 @@ include_once "../objects/User.php";
 include_once "../auth/verify.php";
 include_once "../misc/error.php";
 
-$token = isset($_GET['token'])?$_GET['token']:error(2);
-$user = isset($_GET['id']) ? $_GET['id'] : error(2);
+$token = isset($_POST["token"])?$_POST["token"]:error(2);
+$user = isset($_POST["id"]) ? $_POST["id"] : error(2);
 if(!verify($token,$user))
     error(1);
 $database = new Connection();
 $db = $database->getDb();
-$user = (int)$user;
 $app = new User($db,$user);
 $array = $app->getAppointments();
-$array["status"] = 1;
-print_r(json_encode($array));
+file_put_contents("log1.txt",json_encode($user),8);
+print_r(json_encode(array("status"=>1,"appointments"=>$array)));

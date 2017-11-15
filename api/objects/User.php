@@ -12,9 +12,9 @@ class User
 {
     private $id;
     private $email;
-    private $fname;
-    private $lname;
+    private $self;
     private $phone;
+    private $name;
 
     private $db;
     private $patients;
@@ -25,7 +25,7 @@ class User
      * @param \Medoo\Medoo $db
      * @param int $id
      */
-    public function __construct(\Medoo\Medoo $db,int $id)
+    public function __construct(\Medoo\Medoo $db,$id)
     {
         $this->db = $db;
         $this->id = $id;
@@ -40,7 +40,8 @@ class User
             ["id"],
             ["loginid"=>$this->id]
         );
-        $this->patients = array_values($res);
+        foreach ($res as $key => $value)
+            $this->patients[] = $value["id"];
         $res = $this->db->get(
             TABLES::$user,
             ["self","phone","email"],
@@ -48,16 +49,15 @@ class User
         );
         $this->phone = $res["phone"];
         $this->email = $res["email"];
-        $self = $res["self"];
-        if($self>0)
+        $this->self  = $res["self"];
+        if($this->self>0)
         {
             $res = $this->db->get(
                 TABLES::$patient,
-                ["fname","lname"],
-                ["id"=>$self]
+                ["name"],
+                ["id"=>$this->self]
             );
-            $this->fname = $res["fname"];
-            $this->lname = $res["lname"];
+            $this->name = $res["name"];
         }
     }
 
@@ -71,22 +71,16 @@ class User
 
     public function newPatient(array $details)
     {
-        $fname = $details[0];
-        $lname = $details[1];
-        $age = $details[2];
-        $gender = $details[3];
-        $phone = $details[4];
-        $address = $details[5];
+        $name = $details[0];
+        $age = $details[1];
+        $gender = $details[2];
         $this->db->insert(
             TABLES::$patient,
             [
                 "loginid"=>$this->id,
-                "fname"=>$fname,
-                "lname"=>$lname,
+                "name"=>$name,
                 "age"=>$age,
-                "gender"=>$gender,
-                "phone"=>$phone,
-                "address"=>$address
+                "gender"=>$gender
             ]
         );
         return $this->db->id();
@@ -96,17 +90,24 @@ class User
     {
         $appointments = $this->db->select(
             TABLES::$appointments,
-            ["id","pid","did","date","status"],
+            ["id","pid","did","date"],
             ["pid"=>$this->patients]
         );
+        foreach ($appointments as $appointment) {
+            $appointments[$appointment]["doctor"] = $this->db->get(
+                TABLES::$doctor,
+                ["name"],
+                ["id"=>$appointments[$appointment]["did"]]
+            );
+        }
         return array_values($appointments);
     }
 
     public function addAppointment(array $details)
     {
-        $pid = $details[0];
-        $did = $details[1];
-        $date = $details[2];
+        $pid = $this->self;
+        $did = $details[0];
+        $date = $details[1];
 
         $this->db->insert(
             TABLES::$appointments,

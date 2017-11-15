@@ -11,14 +11,51 @@
 
 require_once "../vendor/autoload.php";
 require_once "../config/Connection.php";
-use Firebase\JWT\JWT;
+require_once "../config/TABLES.php";
 
-function verify(string $token, $user)
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+
+
+function verify(string $idToken, $userId)
 {
+
     try{
-        $key = (array)JWT::decode($token,Connection::$key, array('HS256'));
-        if($key["id"]==(int)$user)
+        $serviceAccount = ServiceAccount::fromJsonFile(__DIR__ . '/firebase_credentials.json');
+        $apiKey = "AIzaSyA6NH0ntC4SQVxlG6AOFozRBnaq8p60RRI";
+        $firebase = (new Factory)
+            ->withServiceAccountAndApiKey($serviceAccount,$apiKey)
+            ->create();
+
+        $auth = $firebase->getAuth();
+        $idToken = $auth->verifyIdToken($idToken);
+
+        $uid = $idToken->getClaim('sub');
+
+        if ($uid == $userId)
             return true;
-    }catch (Exception $e){return false;};
-    return false;
+
+
+
+        return false;
+
+    }catch (Exception $e){ return false;}
+}
+
+function isNewUser($uid)
+{
+    $db = new Connection();
+    $db = $db->getDb();
+
+    $passkey = $db->get(
+        TABLES::$user,
+        ["phone","email","self"],
+        ["id"=>$uid]
+    );
+    file_put_contents("log.txt",$passkey["phone"],8);
+    if(is_array($passkey)&&sizeof($passkey)>0 && $passkey["self"]>0)
+        return false;
+
+    return true;
+
 }

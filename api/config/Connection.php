@@ -11,19 +11,8 @@ use Medoo\Medoo;
 
 class Connection
 {
-    /*
-     *  Connection variables
-     */
     private $dbName = "hospital";
-
-    /*
-     * TODO
-     * Relocate key to somewhere else and generate dynamically
-     */
-    static $key = "secret_key";
-
     private $db = null;
-
     /**
      * Connection constructor.
      */
@@ -47,8 +36,4 @@ class Connection
     {
         return $this->db;
     }
-
-
-
-
 }

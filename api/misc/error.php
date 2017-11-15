@@ -9,6 +9,10 @@
  */
 function error(int $id)
 {
+    print_r(json_encode(array("status" => $id)));
+    die();
+}
+/*
     switch ($id)
     {
         case 1:
@@ -29,3 +33,7 @@ function error(int $id)
     }
     die();
 }
+
+/*
+
+ */

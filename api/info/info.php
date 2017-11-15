@@ -12,15 +12,7 @@ header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json; charset=UTF-8");
 
 include_once "../config/Connection.php";
-include_once "../objects/User.php";
-include_once "../auth/verify.php";
-include_once "../misc/error.php";
 include_once "../config/TABLES.php";
-
-$token = isset($_GET['token'])?$_GET['token']:error(2);
-$user = isset($_GET['id']) ? $_GET['id'] : error(2);
-if(!verify($token,$user))
-    error(1);
 $database = new Connection();
 $db = $database->getDb();
 

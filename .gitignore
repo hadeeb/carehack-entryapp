@@ -3,3 +3,7 @@
 /api/vendor/
 /api/test.php
 /admin/
+index.php
+login.html
+api.zip
+login_success.php
